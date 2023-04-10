@@ -3,7 +3,6 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ClsModule } from 'nestjs-cls';
 import { ChessModule } from './chess/chess.module';
-import { ChessModule } from './chess/chess.module';
 
 @Module({
   imports: [
@@ -17,4 +16,4 @@ import { ChessModule } from './chess/chess.module';
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule {}
+export class AppModule { }
