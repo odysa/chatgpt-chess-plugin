@@ -1,18 +1,20 @@
 import { Chess as RawChess } from 'chess.js';
+import { v4 as uuid } from 'uuid';
+
 export type ChessMove = { from: string; to: string; promotion?: string };
 export type ChessStatus = 'INIT' | 'PLAYING' | 'DONE';
 export type ChessWinner = 'AI' | 'USER';
 
 // Game is the schema in database
 export type Game = {
-  id?: number;
+  id?: string;
   status: ChessStatus;
   winner?: ChessWinner;
   fen: string;
 };
 
 export class ChessGame {
-  private _id: number;
+  private _id: string;
   private chess: RawChess;
   private _status: ChessStatus;
   private _winner: ChessWinner;
@@ -23,10 +25,10 @@ export class ChessGame {
   }
 
   public static default(): ChessGame {
-    return new ChessGame(-1, new RawChess(), 'INIT');
+    return new ChessGame(uuid(), new RawChess(), 'INIT');
   }
 
-  constructor(id: number, chess: RawChess, status: ChessStatus) {
+  constructor(id: string, chess: RawChess, status: ChessStatus) {
     this._id = id;
     this.chess = chess;
     this._status = status;
@@ -40,11 +42,11 @@ export class ChessGame {
     return this._status;
   }
 
-  public setId(id: number) {
+  public setId(id: string) {
     this._id = id;
   }
 
-  public id(): number {
+  public id(): string {
     return this._id;
   }
 
@@ -67,5 +69,9 @@ export class ChessGame {
       status: this._status,
       winner: this._winner,
     };
+  }
+
+  public toAscii(): string {
+    return this.chess.ascii();
   }
 }

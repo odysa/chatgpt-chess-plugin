@@ -21,14 +21,14 @@ export class ChessController {
 
     const chess = ChessGame.default();
     const id = await this.chessService.insertChess(chess);
-    chess.setId(id);
+    return id;
   }
 
   @Get(':id')
-  async findOne(@Param('id') id: number) {
+  async findOne(@Param('id') id: string) {
     const game = await this.chessService.getChess(id);
     if (game) {
-      return game.status();
+      return game.toAscii();
     }
   }
 
@@ -37,8 +37,8 @@ export class ChessController {
     @Param('id') id: string,
     @Body() updateChessDto: UpdateChessDto,
   ) {
-    const { gameId, move } = updateChessDto;
-    const game = await this.chessService.getChess(gameId);
+    const { move } = updateChessDto;
+    const game = await this.chessService.getChess(id);
     game.move(move);
   }
 }

@@ -1,3 +1,3 @@
 export class CreateChessDto {
-  gameId?: number;
+  gameId?: string;
 }

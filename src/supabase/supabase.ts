@@ -23,9 +23,6 @@ export class Supabase {
       this.configService.get('SUPABASE_URL'),
       this.configService.get('SUPABASE_KEY'),
     );
-
-    this.logger.log('auth has been set!');
-
     return this.clientInstance;
   }
 }

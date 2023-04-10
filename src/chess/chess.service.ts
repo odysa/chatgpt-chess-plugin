@@ -1,19 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { Supabase } from 'src/supabase';
-import { ChessGame, ChessStatus, ChessWinner } from './entities/chess.entity';
-
-type Game = {
-  id?: number;
-  status: ChessStatus;
-  winner?: ChessWinner;
-  fen: string;
-};
+import { ChessGame, Game } from './entities/chess.entity';
 
 @Injectable()
 export class ChessService {
   constructor(private readonly supabase: Supabase) {}
 
-  async getChess(id: number): Promise<ChessGame> {
+  async getChess(id: string): Promise<ChessGame> {
     const { data, error } = await this.supabase
       .getClient()
       .from('games')
@@ -28,14 +21,11 @@ export class ChessService {
     return ChessGame.fromGame(data);
   }
 
-  async insertChess(chess: ChessGame): Promise<number> {
+  async insertChess(chess: ChessGame): Promise<string> {
     const { data, error } = await this.supabase
       .getClient()
       .from('games')
-      .insert<Game>({
-        status: chess.status(),
-        fen: chess.fen(),
-      })
+      .insert<Game>(chess.toGame())
       .select()
       .single<Game>();
 
