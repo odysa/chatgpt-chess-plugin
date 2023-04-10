@@ -1,19 +1,12 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Patch,
-  Param,
-} from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param } from '@nestjs/common';
 import { ChessService } from './chess.service';
 import { CreateChessDto } from './dto/create-chess.dto';
 import { UpdateChessDto } from './dto/update-chess.dto';
-import { Chess } from './entities/chess.entity';
+import { ChessGame } from './entities/chess.entity';
 
 @Controller('chess')
 export class ChessController {
-  constructor(private readonly chessService: ChessService) { }
+  constructor(private readonly chessService: ChessService) {}
 
   @Post()
   async create(@Body() createChessDto: CreateChessDto) {
@@ -26,7 +19,7 @@ export class ChessController {
       }
     }
 
-    const chess = Chess.default();
+    const chess = ChessGame.default();
     const id = await this.chessService.insertChess(chess);
     chess.setId(id);
   }

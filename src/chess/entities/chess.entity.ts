@@ -1,5 +1,4 @@
 import { Chess as RawChess } from 'chess.js';
-
 export type ChessMove = { from: string; to: string; promotion?: string };
 export type ChessStatus = 'INIT' | 'PLAYING' | 'DONE';
 export type ChessWinner = 'AI' | 'USER';
@@ -12,19 +11,19 @@ export type Game = {
   fen: string;
 };
 
-export class Chess {
+export class ChessGame {
   private _id: number;
   private chess: RawChess;
   private _status: ChessStatus;
   private _winner: ChessWinner;
 
-  public static fromGame(game: Game): Chess {
+  public static fromGame(game: Game): ChessGame {
     const raw = new RawChess(game.fen);
-    return new Chess(game.id, raw, game.status);
+    return new ChessGame(game.id, raw, game.status);
   }
 
-  public static default(): Chess {
-    return new Chess(-1, new RawChess(), 'INIT');
+  public static default(): ChessGame {
+    return new ChessGame(-1, new RawChess(), 'INIT');
   }
 
   constructor(id: number, chess: RawChess, status: ChessStatus) {

@@ -16,7 +16,7 @@ specifiers:
   '@types/supertest': ^2.0.11
   '@typescript-eslint/eslint-plugin': ^5.0.0
   '@typescript-eslint/parser': ^5.0.0
-  chess.js: 1.0.0-beta.4
+  chess.js: 1.0.0-beta.2
   eslint: ^8.0.1
   eslint-config-prettier: ^8.3.0
   eslint-plugin-prettier: ^4.0.0
@@ -41,7 +41,7 @@ dependencies:
   '@nestjs/mapped-types': 1.2.2_6r5ladex5hev3tpeuknr3oj3pe
   '@nestjs/platform-express': 9.4.0_gqkob5jndcfeb3wjw72wbdwyne
   '@supabase/supabase-js': 2.15.0
-  chess.js: 1.0.0-beta.4
+  chess.js: 1.0.0-beta.2
   nestjs-cls: 3.3.1_gqkob5jndcfeb3wjw72wbdwyne
   reflect-metadata: 0.1.13
   rxjs: 7.8.0
@@ -1974,8 +1974,8 @@ packages:
     resolution: {integrity: sha512-mT8iDcrh03qDGRRmoA2hmBJnxpllMR+0/0qlzjqZES6NdiWDcZkCNAk4rPFZ9Q85r27unkiNNg8ZOiwZXBHwcA==}
     dev: true
 
-  /chess.js/1.0.0-beta.4:
-    resolution: {integrity: sha512-ylSNnm/pNZ96UuZJIQ2cfq0RUQCpOIkid8amXE7Dq7MRPWnPQLlz97oYmGOF5J9yjtU+imqv2mUcsPz+xajNmg==}
+  /chess.js/1.0.0-beta.2:
+    resolution: {integrity: sha512-B8G0PpTTUWvc5vRZDHmV9U+2i5+N583o+irxZwVNIVleXUBrkZC1TEdp6kMsnEs/QmhOHbKrmAr+8nz7zZOs6g==}
     dev: false
 
   /chokidar/3.5.3:

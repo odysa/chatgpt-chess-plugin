@@ -16,4 +16,4 @@ import { ChessModule } from './chess/chess.module';
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule { }
+export class AppModule {}
