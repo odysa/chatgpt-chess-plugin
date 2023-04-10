@@ -40,7 +40,8 @@ export class ChessService {
     const { error } = await this.supabase
       .getClient()
       .from('games')
-      .update<Game>(chess.toGame());
+      .update<Game>(chess.toGame())
+      .match({ id: chess.id() });
     if (error) {
       throw error;
     }

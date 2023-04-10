@@ -64,9 +64,9 @@ export class ChessGame {
 
   public toGame(): Game {
     return {
-      id: this._id,
+      id: this.id(),
       fen: this.fen(),
-      status: this._status,
+      status: this.status(),
       winner: this._winner,
     };
   }

@@ -39,6 +39,11 @@ export class ChessController {
   ) {
     const { move } = updateChessDto;
     const game = await this.chessService.getChess(id);
-    game.move(move);
+    try {
+      game.move(move);
+    } catch {
+      return 'Your move is not valid';
+    }
+    await this.chessService.updateChess(game);
   }
 }
