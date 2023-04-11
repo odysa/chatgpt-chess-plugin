@@ -3,12 +3,12 @@ import { ConfigService } from '@nestjs/config';
 
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 
-@Injectable({ scope: Scope.REQUEST })
+@Injectable({ scope: Scope.DEFAULT })
 export class Supabase {
   private readonly logger = new Logger(Supabase.name);
   private clientInstance: SupabaseClient;
 
-  constructor(private readonly configService: ConfigService) {}
+  constructor(private readonly configService: ConfigService) { }
 
   getClient() {
     this.logger.log('getting supabase client...');

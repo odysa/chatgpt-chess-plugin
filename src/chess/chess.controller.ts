@@ -6,7 +6,7 @@ import { ChessGame } from './entities/chess.entity';
 
 @Controller('chess')
 export class ChessController {
-  constructor(private readonly chessService: ChessService) {}
+  constructor(private readonly chessService: ChessService) { }
 
   @Post()
   async create(@Body() createChessDto: CreateChessDto) {
@@ -15,7 +15,7 @@ export class ChessController {
       const { gameId } = createChessDto;
       const game = await this.chessService.getChess(gameId);
       if (game) {
-        return game.status();
+        return game.toAscii();
       }
     }
 
@@ -29,7 +29,19 @@ export class ChessController {
     const game = await this.chessService.getChess(id);
     if (game) {
       return game.toAscii();
+    } else {
+      return "Game not found"
     }
+  }
+
+  @Patch('/undo/:id')
+  async undo(@Param('id') id: string) {
+    const game = await this.chessService.getChess(id);
+    if (game == null) {
+      return "Game not found"
+    }
+
+    return game.undoLastMove()
   }
 
   @Patch(':id')
@@ -39,6 +51,9 @@ export class ChessController {
   ) {
     const { move } = updateChessDto;
     const game = await this.chessService.getChess(id);
+    if (game == null) {
+      return 'Game not found'
+    }
     try {
       game.move(move);
     } catch {
