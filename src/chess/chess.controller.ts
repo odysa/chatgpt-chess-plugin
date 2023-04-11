@@ -6,7 +6,7 @@ import { ChessGame } from './entities/chess.entity';
 
 @Controller('chess')
 export class ChessController {
-  constructor(private readonly chessService: ChessService) { }
+  constructor(private readonly chessService: ChessService) {}
 
   @Post()
   async create(@Body() createChessDto: CreateChessDto) {
