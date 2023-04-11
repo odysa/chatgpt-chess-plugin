@@ -8,7 +8,7 @@ export class Supabase {
   private readonly logger = new Logger(Supabase.name);
   private clientInstance: SupabaseClient;
 
-  constructor(private readonly configService: ConfigService) { }
+  constructor(private readonly configService: ConfigService) {}
 
   getClient() {
     this.logger.log('getting supabase client...');

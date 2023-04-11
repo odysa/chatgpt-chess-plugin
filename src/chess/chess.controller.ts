@@ -30,7 +30,7 @@ export class ChessController {
     if (game) {
       return game.toAscii();
     } else {
-      return "Game not found"
+      return 'Game not found';
     }
   }
 
@@ -38,10 +38,10 @@ export class ChessController {
   async undo(@Param('id') id: string) {
     const game = await this.chessService.getChess(id);
     if (game == null) {
-      return "Game not found"
+      return 'Game not found';
     }
 
-    return game.undoLastMove()
+    return game.undoLastMove();
   }
 
   @Patch(':id')
@@ -52,7 +52,7 @@ export class ChessController {
     const { move } = updateChessDto;
     const game = await this.chessService.getChess(id);
     if (game == null) {
-      return 'Game not found'
+      return 'Game not found';
     }
     try {
       game.move(move);
