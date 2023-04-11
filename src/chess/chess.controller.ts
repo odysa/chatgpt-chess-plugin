@@ -1,0 +1,64 @@
+import { Controller, Get, Post, Body, Patch, Param } from '@nestjs/common';
+import { ChessService } from './chess.service';
+import { CreateChessDto } from './dto/create-chess.dto';
+import { UpdateChessDto } from './dto/update-chess.dto';
+import { ChessGame } from './entities/chess.entity';
+
+@Controller('chess')
+export class ChessController {
+  constructor(private readonly chessService: ChessService) {}
+
+  @Post()
+  async create(@Body() createChessDto: CreateChessDto) {
+    // we should load game from db
+    if (createChessDto?.gameId) {
+      const { gameId } = createChessDto;
+      const game = await this.chessService.getChess(gameId);
+      if (game) {
+        return game.toAscii();
+      }
+    }
+
+    const chess = ChessGame.default();
+    const id = await this.chessService.insertChess(chess);
+    return id;
+  }
+
+  @Get(':id')
+  async findOne(@Param('id') id: string) {
+    const game = await this.chessService.getChess(id);
+    if (game) {
+      return game.toAscii();
+    } else {
+      return 'Game not found';
+    }
+  }
+
+  @Patch('/undo/:id')
+  async undo(@Param('id') id: string) {
+    const game = await this.chessService.getChess(id);
+    if (game == null) {
+      return 'Game not found';
+    }
+
+    return game.undoLastMove();
+  }
+
+  @Patch(':id')
+  async update(
+    @Param('id') id: string,
+    @Body() updateChessDto: UpdateChessDto,
+  ) {
+    const { move } = updateChessDto;
+    const game = await this.chessService.getChess(id);
+    if (game == null) {
+      return 'Game not found';
+    }
+    try {
+      game.move(move);
+    } catch {
+      return 'Your move is not valid';
+    }
+    await this.chessService.updateChess(game);
+  }
+}
