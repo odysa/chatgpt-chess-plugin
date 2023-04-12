@@ -17,8 +17,8 @@ async function bootstrap() {
   });
 
   app.useStaticAssets(join(__dirname, '..', 'assets'), {
-    prefix: "/assets"
-  })
+    prefix: '/assets',
+  });
 
   const config = new DocumentBuilder()
     .setTitle('ChatGPT Chess Game')
