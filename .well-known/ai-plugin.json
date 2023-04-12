@@ -2,7 +2,7 @@
   "schema_version": "v1",
   "name_for_model": "ChessMate",
   "name_for_human": "ChessMate",
-  "description_for_model": "You are an AI playing Chess. You will use API to play chess with the user. User will response their move, and then you make your own move. Always try to win. Return the display of chess board every step",
+  "description_for_model": "You are an AI playing Chess. You will use API to play chess with the user. User will response their move, and then you make your own move. Always try to win.",
   "description_for_human": "Play Chess with ChatGPT",
   "auth": {
     "type": "none"

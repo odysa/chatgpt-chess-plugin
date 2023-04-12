@@ -1,9 +1,11 @@
-import { Controller, Get, Post, Body, Patch, Param } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Res } from '@nestjs/common';
 import { ChessService } from './chess.service';
 import { CreateChessDto } from './dto/create-chess.dto';
-import { UpdateChessDto } from './dto/update-chess.dto';
 import { ChessGame } from './entities/chess.entity';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import * as ChessImageGenerator from 'chess-image-generator';
+import type { Response } from 'express';
+
 @Controller('chess')
 export class ChessController {
   constructor(private readonly chessService: ChessService) {}
@@ -11,9 +13,9 @@ export class ChessController {
   @Post()
   @ApiTags('Chess')
   @ApiOperation({
-    summary: 'create a new chess game or get a existing game by id',
+    summary: 'Create a new chess game or get a existing game by id',
     description:
-      'create a new chess game and return given id. If the gameId is provided, retrieve the existing game',
+      'Create a new chess game and return given id. If the gameId is provided, retrieve the existing game. Return the id and chessboard img',
   })
   async create(@Body() createChessDto: CreateChessDto) {
     // we should load game from db
@@ -27,7 +29,10 @@ export class ChessController {
 
     const chess = ChessGame.default();
     const id = await this.chessService.insertChess(chess);
-    return id;
+    return {
+      id: id,
+      chessboard: `![picture](http://localhost:3000/chess/board/${id})`,
+    };
   }
 
   @Get(':id')
@@ -61,26 +66,44 @@ export class ChessController {
     return game.undoLastMove();
   }
 
-  @Patch(':id')
+  @Get('/move/:id/:from/:to')
   @ApiTags('Chess')
   @ApiOperation({
     summary: 'move chess of given id in path',
-    description: 'get the game of id, and move chess.',
+    description:
+      'Get the gameId, and move chess. Parameter id is game id, from is original place, and to is destination',
   })
   async update(
     @Param('id') id: string,
-    @Body() updateChessDto: UpdateChessDto,
+    @Param('from') from: string,
+    @Param('to') to: string,
   ) {
-    const { move } = updateChessDto;
     const game = await this.chessService.getChess(id);
     if (game == null) {
       return 'Game not found';
     }
     try {
-      game.move(move);
+      game.move({ from, to });
     } catch {
       return 'Your move is not valid';
     }
     await this.chessService.updateChess(game);
+  }
+
+  @Get('/board/:id')
+  async board(@Param('id') id: string, @Res() res: Response) {
+    const game = await this.chessService.getChess(id);
+    if (game == null) {
+      return 'Game not found';
+    }
+
+    const ig = new ChessImageGenerator();
+    ig.loadFEN(game.fen());
+    const buffer = await ig.generateBuffer();
+    res.set({
+      'Content-Type': 'image/png',
+    });
+    res.send(buffer);
+    return;
   }
 }
