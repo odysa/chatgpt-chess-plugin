@@ -7,6 +7,11 @@ import { join } from 'path';
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
   app.enableCors({ origin: '*' });
+
+  let wellKnownDir = '.local.well-known';
+  if (process.env.MODE === "prod") {
+    wellKnownDir = ".well-known";
+  }
   app.useStaticAssets(join(__dirname, '..', '.well-known'), {
     prefix: '/.well-known/',
   });

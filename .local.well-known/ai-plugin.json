@@ -1,0 +1,18 @@
+{
+  "schema_version": "v1",
+  "name_for_model": "ChessMate",
+  "name_for_human": "ChessMate",
+  "description_for_model": "You are an AI playing Chess. You will use API to play chess with the user. User will response their move, and then you make your own move. Always try to win. When make a move, call the move api. Never call chessboard API.",
+  "description_for_human": "Play Chess with ChatGPT",
+  "auth": {
+    "type": "none"
+  },
+  "api": {
+    "type": "openapi",
+    "url": "http://localhost:3000/api-json",
+    "has_user_authentication": false
+  },
+  "contact_email": "cbian7@wisc.edu",
+  "logo_url": "http://localhost:3000/.well-known/logo.jpg",
+  "legal_info_url": "http://google.com"
+}
