@@ -9,10 +9,10 @@ async function bootstrap() {
   app.enableCors({ origin: '*' });
 
   let wellKnownDir = '.local.well-known';
-  if (process.env.MODE === "prod") {
-    wellKnownDir = ".well-known";
+  if (process.env.MODE === 'prod') {
+    wellKnownDir = '.well-known';
   }
-  app.useStaticAssets(join(__dirname, '..', '.well-known'), {
+  app.useStaticAssets(join(__dirname, '..', wellKnownDir), {
     prefix: '/.well-known/',
   });
 
