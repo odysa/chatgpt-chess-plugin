@@ -5,6 +5,7 @@ import { ChessGame } from './entities/chess.entity';
 import { ApiExcludeEndpoint, ApiOperation, ApiTags } from '@nestjs/swagger';
 import * as ChessImageGenerator from 'chess-image-generator';
 import type { Response } from 'express';
+import { UpdateResponse } from './dto/update-response.dto';
 
 @Controller('chess')
 export class ChessController {
@@ -29,10 +30,7 @@ export class ChessController {
 
     const chess = ChessGame.default();
     const id = await this.chessService.insertChess(chess);
-    return {
-      id: id,
-      chessboard: `![picture](http://localhost:3000/chess/board/${id}?l=0)`,
-    };
+    return UpdateResponse.success(id, 0);
   }
 
   @Get(':id')
@@ -44,14 +42,10 @@ export class ChessController {
   })
   async findOne(@Param('id') id: string) {
     const game = await this.chessService.getChess(id);
-    if (game) {
-      return {
-        success: game.undoLastMove(),
-        chessboard: `![picture](http://localhost:3000/chess/board/${id}?l=${game.steps()})`,
-      };
-    } else {
+    if (game == null) {
       return 'Game not found';
     }
+    return UpdateResponse.success(id, game.steps());
   }
 
   @Get('/undo/:id')
@@ -65,10 +59,7 @@ export class ChessController {
     if (game == null) {
       return 'Game not found';
     }
-    return {
-      success: game.undoLastMove(),
-      chessboard: `![picture](http://localhost:3000/chess/board/${id}?l=${game.steps()})`,
-    };
+    return new UpdateResponse(game.undoLastMove(), id, game.steps());
   }
 
   @Get('/move/:id/:from/:to')
@@ -91,10 +82,7 @@ export class ChessController {
     try {
       game.move({ from, to });
       await this.chessService.updateChess(game);
-      return {
-        success: true,
-        chessboard: `![picture](http://localhost:3000/chess/board/${id}?l=${game.steps()})`,
-      };
+      return UpdateResponse.success(id, game.steps());
     } catch {
       return 'Your move is not valid';
     }
@@ -113,8 +101,6 @@ export class ChessController {
     const buffer = await ig.generateBuffer();
     res.set({
       'Content-Type': 'image/png',
-      'Cache-Control': 'no-cache, no-store, must-revalidate',
-      Expires: 0,
     });
     res.send(buffer);
     return;
