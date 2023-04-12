@@ -9,10 +9,10 @@
   },
   "api": {
     "type": "openapi",
-    "url": "http://localhost:3000/api-json",
+    "url": "https://chessmate.cc/api-json",
     "has_user_authentication": false
   },
   "contact_email": "cbian7@wisc.edu",
-  "logo_url": "http://localhost:3000/.well-known/logo.jpg",
-  "legal_info_url": "http://google.com"
+  "logo_url": "https://chessmate.cc/assets/logo.png",
+  "legal_info_url": "https://chessmate.cc"
 }
