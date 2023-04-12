@@ -1,8 +1,8 @@
-import { Controller, Get, Post, Body, Patch, Param, Res } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Res } from '@nestjs/common';
 import { ChessService } from './chess.service';
 import { CreateChessDto } from './dto/create-chess.dto';
 import { ChessGame } from './entities/chess.entity';
-import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiExcludeEndpoint, ApiOperation, ApiTags } from '@nestjs/swagger';
 import * as ChessImageGenerator from 'chess-image-generator';
 import type { Response } from 'express';
 
@@ -31,7 +31,7 @@ export class ChessController {
     const id = await this.chessService.insertChess(chess);
     return {
       id: id,
-      chessboard: `![picture](http://localhost:3000/chess/board/${id})`,
+      chessboard: `![picture](http://localhost:3000/chess/board/${id}?l=0)`,
     };
   }
 
@@ -45,13 +45,16 @@ export class ChessController {
   async findOne(@Param('id') id: string) {
     const game = await this.chessService.getChess(id);
     if (game) {
-      return game.toAscii();
+      return {
+        success: game.undoLastMove(),
+        chessboard: `![picture](http://localhost:3000/chess/board/${id}?l=${game.steps()})`,
+      };
     } else {
       return 'Game not found';
     }
   }
 
-  @Patch('/undo/:id')
+  @Get('/undo/:id')
   @ApiTags('Chess')
   @ApiOperation({
     summary: 'undo last move',
@@ -62,8 +65,10 @@ export class ChessController {
     if (game == null) {
       return 'Game not found';
     }
-
-    return game.undoLastMove();
+    return {
+      success: game.undoLastMove(),
+      chessboard: `![picture](http://localhost:3000/chess/board/${id}?l=${game.steps()})`,
+    };
   }
 
   @Get('/move/:id/:from/:to')
@@ -82,15 +87,21 @@ export class ChessController {
     if (game == null) {
       return 'Game not found';
     }
+
     try {
       game.move({ from, to });
+      await this.chessService.updateChess(game);
+      return {
+        success: true,
+        chessboard: `![picture](http://localhost:3000/chess/board/${id}?l=${game.steps()})`,
+      };
     } catch {
       return 'Your move is not valid';
     }
-    await this.chessService.updateChess(game);
   }
 
   @Get('/board/:id')
+  @ApiExcludeEndpoint()
   async board(@Param('id') id: string, @Res() res: Response) {
     const game = await this.chessService.getChess(id);
     if (game == null) {
@@ -102,6 +113,8 @@ export class ChessController {
     const buffer = await ig.generateBuffer();
     res.set({
       'Content-Type': 'image/png',
+      'Cache-Control': 'no-cache, no-store, must-revalidate',
+      Expires: 0,
     });
     res.send(buffer);
     return;
