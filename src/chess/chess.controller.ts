@@ -1,14 +1,22 @@
-import { Controller, Get, Post, Body, Patch, Param } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Res } from '@nestjs/common';
 import { ChessService } from './chess.service';
 import { CreateChessDto } from './dto/create-chess.dto';
-import { UpdateChessDto } from './dto/update-chess.dto';
 import { ChessGame } from './entities/chess.entity';
+import { ApiExcludeEndpoint, ApiOperation, ApiTags } from '@nestjs/swagger';
+import * as ChessImageGenerator from 'chess-image-generator';
+import type { Response } from 'express';
 
 @Controller('chess')
 export class ChessController {
   constructor(private readonly chessService: ChessService) {}
 
   @Post()
+  @ApiTags('Chess')
+  @ApiOperation({
+    summary: 'Create a new chess game or get a existing game by id',
+    description:
+      'Create a new chess game and return given id. If the gameId is provided, retrieve the existing game. Return the id and chessboard img',
+  })
   async create(@Body() createChessDto: CreateChessDto) {
     // we should load game from db
     if (createChessDto?.gameId) {
@@ -21,44 +29,94 @@ export class ChessController {
 
     const chess = ChessGame.default();
     const id = await this.chessService.insertChess(chess);
-    return id;
+    return {
+      id: id,
+      chessboard: `![picture](http://localhost:3000/chess/board/${id}?l=0)`,
+    };
   }
 
   @Get(':id')
+  @ApiTags('Chess')
+  @ApiOperation({
+    summary: 'get a chess game ascii display',
+    description:
+      'The id is provided, retrieve the existing game, return the ascii chess board',
+  })
   async findOne(@Param('id') id: string) {
     const game = await this.chessService.getChess(id);
     if (game) {
-      return game.toAscii();
+      return {
+        success: game.undoLastMove(),
+        chessboard: `![picture](http://localhost:3000/chess/board/${id}?l=${game.steps()})`,
+      };
     } else {
       return 'Game not found';
     }
   }
 
-  @Patch('/undo/:id')
+  @Get('/undo/:id')
+  @ApiTags('Chess')
+  @ApiOperation({
+    summary: 'undo last move',
+    description: 'undo last move of game id',
+  })
   async undo(@Param('id') id: string) {
     const game = await this.chessService.getChess(id);
     if (game == null) {
       return 'Game not found';
     }
-
-    return game.undoLastMove();
+    return {
+      success: game.undoLastMove(),
+      chessboard: `![picture](http://localhost:3000/chess/board/${id}?l=${game.steps()})`,
+    };
   }
 
-  @Patch(':id')
+  @Get('/move/:id/:from/:to')
+  @ApiTags('Chess')
+  @ApiOperation({
+    summary: 'move chess of given id in path',
+    description:
+      'Get the gameId, and move chess. Parameter id is game id, from is original place, and to is destination',
+  })
   async update(
     @Param('id') id: string,
-    @Body() updateChessDto: UpdateChessDto,
+    @Param('from') from: string,
+    @Param('to') to: string,
   ) {
-    const { move } = updateChessDto;
     const game = await this.chessService.getChess(id);
     if (game == null) {
       return 'Game not found';
     }
+
     try {
-      game.move(move);
+      game.move({ from, to });
+      await this.chessService.updateChess(game);
+      return {
+        success: true,
+        chessboard: `![picture](http://localhost:3000/chess/board/${id}?l=${game.steps()})`,
+      };
     } catch {
       return 'Your move is not valid';
     }
-    await this.chessService.updateChess(game);
+  }
+
+  @Get('/board/:id')
+  @ApiExcludeEndpoint()
+  async board(@Param('id') id: string, @Res() res: Response) {
+    const game = await this.chessService.getChess(id);
+    if (game == null) {
+      return 'Game not found';
+    }
+
+    const ig = new ChessImageGenerator();
+    ig.loadFEN(game.fen());
+    const buffer = await ig.generateBuffer();
+    res.set({
+      'Content-Type': 'image/png',
+      'Cache-Control': 'no-cache, no-store, must-revalidate',
+      Expires: 0,
+    });
+    res.send(buffer);
+    return;
   }
 }
